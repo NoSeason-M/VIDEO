@@ -1,0 +1,113 @@
+# README
+
+## 项目概述
+
+Vue 3 + TypeScript + Electron 桌面应用项目。
+
+## 技术栈
+
+| 技术 | 用途 |
+|---|---|
+| **Vue 3** (^3.5.32) | 前端 UI 框架（Composition API） |
+| **TypeScript** (~6.0.2) | 类型安全开发 |
+| **Vite** (^8.0.10) | 构建工具与开发服务器 |
+| **Electron** (^42.0.1) | 桌面应用壳 |
+| **electron-builder** (^26.8.1) | 桌面应用打包 |
+| **vite-plugin-electron** (^0.29.1) | Vite 中编译 Electron 主进程 / preload |
+| **vite-plugin-electron-renderer** (^0.14.7) | 渲染进程 Node.js 模块兼容 |
+
+## 目录结构
+
+```
+video/
+├── electron/
+│   ├── main.ts              # Electron 主进程入口
+│   └── preload.ts           # 预加载脚本（contextBridge）
+├── src/
+│   ├── App.vue              # 根组件
+│   ├── main.ts              # Vue 应用入口
+│   ├── style.css            # 全局样式
+│   ├── electron.d.ts        # electronAPI 类型声明
+│   ├── assets/              # 静态资源
+│   └── components/          # 组件
+├── public/                  # 公共资源
+├── index.html               # HTML 入口
+├── vite.config.ts           # Vite + Electron 插件配置
+├── tsconfig.json            # TS 配置（引用 app/node 两个子配置）
+├── tsconfig.app.json        # src 目录 TS 配置
+├── tsconfig.node.json       # vite.config.ts + electron 目录 TS 配置
+└── package.json             # 依赖与脚本
+```
+
+## 依赖清单
+
+### 运行时依赖
+
+- **vue** ^3.5.32
+
+### 开发依赖
+
+- **@vitejs/plugin-vue** ^6.0.6 — Vite Vue 插件
+- **vue-tsc** ^3.2.7 — Vue TypeScript 类型检查
+- **@vue/tsconfig** ^0.9.1 — Vue TS 配置预设
+- **typescript** ~6.0.2
+- **vite** ^8.0.10
+- **electron** ^42.0.1
+- **electron-builder** ^26.8.1
+- **vite-plugin-electron** ^0.29.1
+- **vite-plugin-electron-renderer** ^0.14.7
+- **esbuild** ^0.28.0
+- **concurrently** ^9.2.1
+- **cross-env** ^10.1.0
+- **wait-on** ^9.0.5
+- **@types/node** ^24.12.2
+
+## 关键配置说明
+
+### vite.config.ts
+
+使用 `vite-plugin-electron` 将 `electron/main.ts` 和 `electron/preload.ts` 分别编译到 `dist-electron/` 目录。开发模式下自动启动 Electron 窗口并加载 Vite 开发服务器。
+
+### package.json
+
+- `"main": "dist-electron/main.js"` — Electron 入口指向编译后的主进程文件
+- `"build"` 字段 — electron-builder 打包配置，输出到 `release/` 目录
+
+### electron/main.ts
+
+- 开发模式：通过 `process.env.VITE_DEV_SERVER_URL` 加载 Vite 开发服务器
+- 生产模式：加载 `dist/index.html`
+- 启用了 `contextIsolation: true` 和 `nodeIntegration: false`，保证安全性
+- macOS 支持 `activate` 事件（点击 Dock 图标重新创建窗口）
+
+### electron/preload.ts
+
+通过 `contextBridge.exposeInMainWorld` 向渲染进程暴露 `window.electronAPI`：
+
+- `platform` — 当前操作系统平台
+- `send(channel, ...args)` — 向主进程发送消息（单向）
+- `on(channel, callback)` — 监听主进程消息
+- `invoke(channel, ...args)` — 向主进程发送消息并等待返回（双向 IPC）
+
+## 可用命令
+
+| 命令 | 说明 |
+|---|---|
+| `pnpm dev` | 启动 Vite 开发服务器 + Electron 窗口（支持热重载） |
+| `pnpm build` | TypeScript 类型检查 + 构建 Vue 应用和 Electron（输出到 dist/ 和 dist-electron/） |
+| `pnpm preview` | 预览构建后的 Vue 应用 |
+| `pnpm electron:build` | 构建后通过 electron-builder 打包桌面安装包（Windows NSIS / macOS DMG / Linux AppImage） |
+
+## 启动开发
+
+```bash
+pnpm dev
+```
+
+## 打包构建
+
+```bash
+pnpm electron:build
+```
+
+打包产物位于 `release/` 目录。

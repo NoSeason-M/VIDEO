@@ -1,0 +1,52 @@
+{
+  "name": "video",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "electron:build": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "vue": "^3.5.32"
+  },
+  "build": {
+    "appId": "com.video.app",
+    "productName": "Video",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^42.0.1",
+    "electron-builder": "^26.8.1",
+    "esbuild": "^0.28.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.10",
+    "vite-plugin-electron": "^0.29.1",
+    "vite-plugin-electron-renderer": "^0.14.7",
+    "vue-tsc": "^3.2.7",
+    "wait-on": "^9.0.5"
+  }
+}
