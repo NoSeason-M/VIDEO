@@ -52,7 +52,7 @@ const config: Record<string, number> = {
 const appContainer = ref<HTMLDivElement>()
 const videoPlayer = ref<HTMLVideoElement>()
 
-const baseUrl = `http://${minioIp}:9000/${bucketName}/${rootDir}/`;
+const baseUrl = `http://${minioIp.value}:9000/${bucketName}/${rootDir}/`;
 
 // 检测视频文件是否存在（MinIO中）
 async function checkVideoExists(url: string): Promise<boolean> {

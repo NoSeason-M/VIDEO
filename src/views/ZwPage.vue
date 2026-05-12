@@ -51,7 +51,7 @@ let scale = 1;
 let isDragging = false;
 let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
 
-const baseUrl = `http://${minioIp}:9000/${bucketName}/${rootDir}/`;
+const baseUrl = `http://${minioIp.value}:9000/${bucketName}/${rootDir}/`;
 
 // 检测文件是否存在（通用：支持mp4/jpg/png）
 async function checkFileExists(url: string): Promise<boolean> {
