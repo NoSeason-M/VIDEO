@@ -24,10 +24,15 @@ video/
 │   ├── main.ts              # Electron 主进程入口
 │   └── preload.ts           # 预加载脚本（contextBridge）
 ├── src/
-│   ├── App.vue              # 根组件
+│   ├── App.vue              # 根组件（含侧边栏导航 + router-view）
 │   ├── main.ts              # Vue 应用入口
 │   ├── style.css            # 全局样式
 │   ├── electron.d.ts        # electronAPI 类型声明
+│   ├── router/
+│   │   └── index.ts         # Vue Router 配置（/video、/zw 路由）
+│   ├── views/
+│   │   ├── VideoPage.vue    # 视频页面（源自 video.html）
+│   │   └── ZwPage.vue       # 视频+图片页面（源自 zw.html）
 │   ├── assets/              # 静态资源
 │   └── components/          # 组件
 ├── public/                  # 公共资源
@@ -44,6 +49,7 @@ video/
 ### 运行时依赖
 
 - **vue** ^3.5.32
+- **vue-router** ^4.6.4 — 路由管理
 
 ### 开发依赖
 
@@ -111,3 +117,27 @@ pnpm electron:build
 ```
 
 打包产物位于 `release/` 目录。
+
+## 页面路由
+
+项目使用 Vue Router 管理多页面切换：
+
+| 路由 | 页面 | 说明 |
+|---|---|---|
+| `/` | — | 自动重定向到 `/video` |
+| `/video` | VideoPage | 视频播放页面（源自 `video.html`），从 MinIO 加载 .mp4 文件，支持封面生成、全屏播放、音量10%、循环播放 |
+| `/zw` | ZwPage | 视频+图片页面（源自 `zw.html`），从 MinIO 加载 .mp4/.jpg/.png 文件，保留图片预览缩放与拖拽功能，默认音量30% |
+
+### 侧边栏导航
+
+- 左侧白色背景侧边栏，黑色文字
+- 点击右上角 **×** 隐藏侧边栏
+- 隐藏后左上角显示 **☰** 按钮，点击可重新展开
+- 点击菜单项通过路由切换页面
+
+### 扩展页面
+
+如需添加新页面：
+1. 在 `src/views/` 下新建 `.vue` 组件
+2. 在 `src/router/index.ts` 中添加对应路由
+3. 在 `src/App.vue` 的 `menuItems` 中添加菜单项
