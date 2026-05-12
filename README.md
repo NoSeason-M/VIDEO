@@ -29,12 +29,14 @@ video/
 │   ├── style.css            # 全局样式
 │   ├── electron.d.ts        # electronAPI 类型声明
 │   ├── router/
-│   │   └── index.ts         # Vue Router 配置（/video、/zw 路由）
+│   │   └── index.ts         # Vue Router 配置（/login、/video、/zw 路由）
 │   ├── views/
+│   │   ├── LoginPage.vue    # 登录页面（深色玻璃拟态风格）
 │   │   ├── VideoPage.vue    # 视频页面（源自 video.html）
 │   │   └── ZwPage.vue       # 视频+图片页面（源自 zw.html）
+│   ├── store/
+│   │   └── ip.ts              # 共享 IP 地址状态（登录页设置，各页面读取）
 │   ├── assets/              # 静态资源
-│   └── components/          # 组件
 ├── public/                  # 公共资源
 ├── index.html               # HTML 入口
 ├── vite.config.ts           # Vite + Electron 插件配置
@@ -124,9 +126,18 @@ pnpm electron:build
 
 | 路由 | 页面 | 说明 |
 |---|---|---|
-| `/` | — | 自动重定向到 `/video` |
+| `/` | — | 自动重定向到 `/login` |
+| `/login` | LoginPage | 登录页面，输入密码和 IP 地址后进入视频页。账号固定为 yj，密码 20251001 |
 | `/video` | VideoPage | 视频播放页面（源自 `video.html`），从 MinIO 加载 .mp4 文件，支持封面生成、全屏播放、音量10%、循环播放 |
 | `/zw` | ZwPage | 视频+图片页面（源自 `zw.html`），从 MinIO 加载 .mp4/.jpg/.png 文件，保留图片预览缩放与拖拽功能，默认音量30% |
+
+### 共享 IP 地址
+
+IP 地址通过 `src/store/ip.ts` 全局共享：
+
+1. 登录页输入 MinIO IP 地址后点击登录，IP 存入共享状态
+2. VideoPage 和 ZwPage 从 `useIp()` 读取 `minioIp` 构建资源 URL
+3. 切换 IP 时只需重新登录，输入新 IP 即可
 
 ### 侧边栏导航
 
