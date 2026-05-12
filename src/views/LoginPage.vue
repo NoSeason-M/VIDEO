@@ -285,15 +285,15 @@ function handleLogin() {
 
 .account-text {
   flex: 1;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
   font-size: 15px;
   padding: 14px 0;
   letter-spacing: 1px;
 }
 
 .static-account {
-  opacity: 0.7;
   cursor: default;
+  border-color: rgba(129, 140, 248, 0.3);
 }
 
 .error-msg {
