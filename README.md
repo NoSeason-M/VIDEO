@@ -4,6 +4,21 @@
 
 Vue 3 + TypeScript + Electron 桌面应用项目。
 
+### 快速开始
+
+```bash
+# 1. 安装 pnpm（如已安装可跳过）
+npm install -g pnpm
+
+# 2. 安装依赖
+pnpm install
+
+# 3. 启动开发服务器 + Electron 窗口
+pnpm dev
+```
+
+> 要求 Node.js >= 18。首次安装 Electron 依赖较大会稍等片刻。
+
 ## 技术栈
 
 | 技术 | 用途 |
