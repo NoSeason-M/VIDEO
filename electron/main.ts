@@ -1,6 +1,15 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'node:path'
 
+// ===================== 修复 __dirname 未定义（ESM 兼容）=====================
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+// 定义兼容 ES 模块的 __filename 和 __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+// ======================================================================
+
 process.env.DIST = path.join(__dirname, '../dist')
 process.env.VITE_PUBLIC = app.isPackaged
   ? process.env.DIST
