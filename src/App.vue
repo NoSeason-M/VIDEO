@@ -2,9 +2,13 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
+import { computed } from 'vue'
+
 const router = useRouter()
 const route = useRoute()
 const sidebarVisible = ref(true)
+
+const isLoginPage = computed(() => route.path === '/login')
 
 const menuItems = [
   { name: 'video', label: 'video', route: '/video' },
@@ -21,7 +25,10 @@ function navigateTo(path: string) {
 </script>
 
 <template>
-  <div class="layout">
+  <div v-if="isLoginPage" class="login-layout">
+    <router-view />
+  </div>
+  <div v-else class="layout">
     <!-- 侧边栏遮罩（手机端） -->
     <div
       v-if="sidebarVisible"
@@ -90,6 +97,11 @@ html, body {
   display: flex;
   min-height: 100vh;
   position: relative;
+}
+
+.login-layout {
+  width: 100%;
+  height: 100vh;
 }
 
 /* 侧边栏遮罩 */

@@ -1,6 +1,6 @@
 <template>
   <div class="zw-page">
-    <h1 class="main-title">抖音视频库</h1>
+    <h1 class="main-title">zw</h1>
     <div ref="appContainer" id="app"></div>
 
     <!-- 视频播放弹窗 -->
@@ -24,9 +24,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useIp } from '../store/ip'
 
 // ====================== 仅修改这里 → 可无限添加分类 ======================
-const minioIp = "10.14.187.132";
+const { minioIp } = useIp();
 const bucketName = "video";
 const rootDir = "17岁自拍";
 

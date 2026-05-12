@@ -1,11 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import LoginPage from '../views/LoginPage.vue'
 import VideoPage from '../views/VideoPage.vue'
 import ZwPage from '../views/ZwPage.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/video'
+    redirect: '/login'
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage
   },
   {
     path: '/video',
