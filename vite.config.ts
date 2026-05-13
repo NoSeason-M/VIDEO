@@ -9,12 +9,26 @@ export default defineConfig({
     electron([
       {
         entry: 'electron/main.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['electron-updater']
+            }
+          }
+        }
       },
       {
         entry: 'electron/preload.ts',
         onstart(args) {
           args.reload()
         },
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['electron']
+            }
+          }
+        }
       },
     ]),
     renderer(),
