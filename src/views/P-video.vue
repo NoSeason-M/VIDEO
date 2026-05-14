@@ -53,35 +53,53 @@ async function checkVideoExists(url: string): Promise<boolean> {
   }
 }
 
-// 渲染所有分类
+// 渲染单个分类（仅当有有效视频时）
+async function renderSingleCategory(dirName: string, count: number) {
+  // 第一步：数量≤0直接跳过
+  if (count <= 0) return;
+
+  // 第二步：检测该分类下是否有至少一个有效视频
+  let hasValidVideo = false;
+  const validVideos: { url: string; name: string }[] = [];
+
+  for (let i = 1; i <= count; i++) {
+    const fileName = `${i}.mp4`;
+    const fullPath = `${dirName}/${fileName}`;
+    const videoUrl = baseUrl + fullPath;
+
+    const exists = await checkVideoExists(videoUrl);
+    if (exists) {
+      hasValidVideo = true;
+      validVideos.push({ url: videoUrl, name: `${dirName}${i}.mp4` });
+    }
+  }
+
+  // 无有效视频则跳过渲染
+  if (!hasValidVideo) return;
+
+  // 有有效视频则渲染分类
+  const group = document.createElement("div");
+  group.className = "folder-group";
+  group.innerHTML = `<div class="folder-title">📂 ${dirName}</div>`;
+
+  const grid = document.createElement("div");
+  grid.className = "video-grid";
+  group.appendChild(grid);
+
+  validVideos.forEach(video => {
+    createVideoCard(grid, video.url, video.name);
+  });
+
+  appContainer.value!.appendChild(group);
+}
+
+// 渲染所有分类：自动隐藏无视频的分类
 async function renderAll() {
   appContainer.value!.innerHTML = "";
 
   for (const dirName in config) {
     const count = config[dirName];
-    const group = document.createElement("div");
-    group.className = "folder-group";
-    group.innerHTML = `<div class="folder-title">📂 ${dirName}</div>`;
-
-    const grid = document.createElement("div");
-    grid.className = "video-grid";
-    group.appendChild(grid);
-
-    for (let i = 1; i <= count; i++) {
-      const fileName = `${i}.mp4`;
-      const fullPath = `${dirName}/${fileName}`;
-      const videoUrl = baseUrl + fullPath;
-      const displayName = `${dirName}${i}.mp4`;
-
-      const exists = await checkVideoExists(videoUrl);
-      if (exists) {
-        createVideoCard(grid, videoUrl, displayName);
-      }
-    }
-
-    if (grid.children.length > 0) {
-      appContainer.value!.appendChild(group);
-    }
+    await renderSingleCategory(dirName, count);
   }
 }
 
@@ -99,7 +117,7 @@ function createVideoCard(container: HTMLElement, url: string, name: string) {
   const v = document.createElement("video");
   v.src = url;
   v.crossOrigin = "anonymous" as const;
-  v.currentTime = 0.5;
+  v.currentTime = 2.2;
   v.onloadeddata = () => {
     const canvas = document.createElement("canvas");
     canvas.width = v.videoWidth;
@@ -124,15 +142,12 @@ function createVideoCard(container: HTMLElement, url: string, name: string) {
   container.appendChild(card);
 }
 
-// 切换控件显示/隐藏
+// 切换控件显示/隐藏（对齐video.html的切换逻辑）
 function toggleControls() {
   if (!videoPlayer.value) return;
-  videoPlayer.value.controls = true;
+  videoPlayer.value.controls = !videoPlayer.value.controls;
   const closeBtn = document.getElementById("closeBtn")!;
-  closeBtn.style.display = "block";
-  if (videoPlayer.value.paused) {
-    videoPlayer.value.play();
-  }
+  closeBtn.style.display = videoPlayer.value.controls ? "block" : "none";
 }
 
 // 关闭播放
@@ -149,13 +164,6 @@ function closeVideo() {
 
 onMounted(() => {
   renderAll();
-  // 视频播放结束后自动重新播放
-  const player = videoPlayer.value;
-  if (player) {
-    player.addEventListener('ended', function() {
-      this.play();
-    });
-  }
 });
 </script>
 
