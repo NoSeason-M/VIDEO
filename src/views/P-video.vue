@@ -1,6 +1,6 @@
 <template>
   <div class="p-video-page">
-    <h1 class="main-title">视频库</h1>
+    <h1 class="main-title">P-video</h1>
     <div ref="appContainer" id="app"></div>
 
     <div class="player-modal" id="modal" @click="closeVideo">
