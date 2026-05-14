@@ -13,6 +13,9 @@ const isLoginPage = computed(() => route.path === '/login')
 const menuItems = [
   { name: 'video', label: 'video', route: '/video' },
   { name: 'zw', label: 'zw', route: '/zw' },
+  { name: 'p-video', label: 'P-video', route: '/p-video' },
+  { name: 'yj-basic', label: 'yj-basic', route: '/yj-basic' },
+  { name: 'picture', label: '图片', route: '/picture' },
 ]
 
 function toggleSidebar() {

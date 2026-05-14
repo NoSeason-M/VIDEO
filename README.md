@@ -44,11 +44,14 @@ video/
 │   ├── style.css            # 全局样式
 │   ├── electron.d.ts        # electronAPI 类型声明
 │   ├── router/
-│   │   └── index.ts         # Vue Router 配置（/login、/video、/zw 路由）
+│   │   └── index.ts         # Vue Router 配置（/login、/video、/zw、/p-video、/yj-basic、/picture 路由）
 │   ├── views/
 │   │   ├── LoginPage.vue    # 登录页面（深色玻璃拟态风格）
 │   │   ├── VideoPage.vue    # 视频页面（源自 video.html）
-│   │   └── ZwPage.vue       # 视频+图片页面（源自 zw.html）
+│   │   ├── ZwPage.vue       # 视频+图片页面（源自 zw.html）
+│   │   ├── P-video.vue      # 视频页面（源自 P-video.html，PIAN目录）
+│   │   ├── yj-basic.vue     # 图片+音乐页面（源自 yj-basic.html）
+│   │   └── 图片.vue          # 图片页面（源自 图片.html）
 │   ├── store/
 │   │   └── ip.ts              # 共享 IP 地址状态（登录页设置，各页面读取）
 │   ├── assets/              # 静态资源
@@ -67,6 +70,7 @@ video/
 
 - **vue** ^3.5.32
 - **vue-router** ^4.6.4 — 路由管理
+- **electron-updater** ^6.8.3 — 自动更新（通过 GitHub Releases 发布新版本）
 
 ### 开发依赖
 
@@ -112,25 +116,56 @@ video/
 - `on(channel, callback)` — 监听主进程消息
 - `invoke(channel, ...args)` — 向主进程发送消息并等待返回（双向 IPC）
 
+### 自动更新
+
+项目使用 `electron-updater` 配合 GitHub Releases 实现桌面应用自动更新。
+
+**发布配置（package.json）：**
+
+- `appId`: `com.video.app`
+- `productName`: `Video`
+- 发布提供商：`github`，仓库 `NoSeason-M/VIDEO`
+- 打包格式：Windows NSIS、macOS DMG、Linux AppImage
+
+**更新流程：**
+
+1. 应用启动 3 秒后，主进程调用 `autoUpdater.checkForUpdatesAndNotify()` 检查 GitHub Releases 是否有新版本
+2. 检测到新版本 → 弹出对话框提示用户（显示当前版本与新版本号），自动后台下载
+3. 下载完成 → 弹出对话框询问「立即重启」或「稍后再说」
+4. 用户点击立即重启 → `autoUpdater.quitAndInstall()` 完成更新安装
+
+**发版流程：**
+
+每次发布新版本时：
+
+```bash
+# 1. 更新 package.json 中的 version 字段
+# 2. 构建并打包
+pnpm run electron:build
+# 3. 在 GitHub 创建 Release，上传 release/ 目录下的安装包
+```
+
+> 注意：`electron-updater` 已在 `vite.config.ts` 中配置为外部模块，不会被打包到 Vite 产物中。版本号从 `package.json` 读取，每次发版前需手动更新。
+
 ## 可用命令
 
 | 命令 | 说明 |
 |---|---|
-| `pnpm dev` | 启动 Vite 开发服务器 + Electron 窗口（支持热重载） |
-| `pnpm build` | TypeScript 类型检查 + 构建 Vue 应用和 Electron（输出到 dist/ 和 dist-electron/） |
-| `pnpm preview` | 预览构建后的 Vue 应用 |
-| `pnpm electron:build` | 构建后通过 electron-builder 打包桌面安装包（Windows NSIS / macOS DMG / Linux AppImage） |
+| `npm run dev` | 启动 Vite 开发服务器 + Electron 窗口（支持热重载） |
+| `npm run build` | TypeScript 类型检查 + 构建 Vue 应用和 Electron（输出到 dist/ 和 dist-electron/） |
+| `npm run preview` | 预览构建后的 Vue 应用 |
+| `npm run electron:build` | 构建后通过 electron-builder 打包桌面安装包（Windows NSIS / macOS DMG / Linux AppImage） |
 
 ## 启动开发
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 ## 打包构建
 
 ```bash
-pnpm electron:build
+npm run electron:build
 ```
 
 打包产物位于 `release/` 目录。
@@ -145,13 +180,16 @@ pnpm electron:build
 | `/login` | LoginPage | 登录页面，输入密码和 IP 地址后进入视频页。账号固定为 yj，密码 20251001 |
 | `/video` | VideoPage | 视频播放页面（源自 `video.html`），从 MinIO 加载 .mp4 文件，支持封面生成、全屏播放、音量10%、循环播放 |
 | `/zw` | ZwPage | 视频+图片页面（源自 `zw.html`），从 MinIO 加载 .mp4/.jpg/.png 文件，保留图片预览缩放与拖拽功能，默认音量30% |
+| `/p-video` | P-video | 视频页面（源自 `P-video.html`），从 `video/PIAN/` 加载 .mp4 文件，支持封面生成、自动重播 |
+| `/yj-basic` | yj-basic | 图片+音乐页面（源自 `yj-basic.html`），从 `picture-yj/yj/` 加载图片，带背景音乐播放器（播放/暂停、音量调节、单曲/列表循环） |
+| `/picture` | 图片 | 图片页面（源自 `图片.html`），从 `video/图片/` 加载图片，支持滚轮缩放、鼠标拖拽平移 |
 
 ### 共享 IP 地址
 
 IP 地址通过 `src/store/ip.ts` 全局共享：
 
 1. 登录页输入 MinIO IP 地址后点击登录，IP 存入共享状态
-2. VideoPage 和 ZwPage 从 `useIp()` 读取 `minioIp` 构建资源 URL
+2. VideoPage、ZwPage 等页面从 `useIp()` 读取 `minioIp` 构建资源 URL
 3. 切换 IP 时只需重新登录，输入新 IP 即可
 
 ### 侧边栏导航
