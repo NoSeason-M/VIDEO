@@ -1,7 +1,7 @@
 {
   "name": "video",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
@@ -26,22 +26,35 @@
       "dist-electron/**/*"
     ],
     "win": {
+      
       "target": "nsis"
+      
     },
     "mac": {
+      
       "target": "dmg"
     },
     "linux": {
+      
       "target": "AppImage"
     },
+    
     "publish": [
       {
-        "provider": "github",
-        "owner": "NoSeason-M",
-        "repo": "VIDEO",
-        "releaseType": "release"
+        "provider": "generic",
+        "url": "https://ghproxy.com/https://github.com/NoSeason-M/VIDEO/releases/latest/download/",
+        "channel": "latest"
+        
       }
-    ]
+    ],
+    "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Video",
+    "differentialPackage": true
+  }
   },
   "devDependencies": {
     "@types/node": "^24.12.2",

@@ -1,6 +1,6 @@
 <template>
   <div class="zw-page">
-    <h1 class="main-title">zw</h1>
+    <h1 class="main-title">视频</h1>
     <div ref="appContainer" id="app"></div>
 
     <!-- 视频播放弹窗 -->

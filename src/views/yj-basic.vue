@@ -1,6 +1,6 @@
 <template>
   <div class="yj-basic-page">
-    <h1 class="main-title">yj--我想以此来记录我认识的喻婕</h1>
+    <h1 class="main-title">yj--我想以此来记录我认识的她</h1>
 
     <div class="music-control">
       <select class="music-select" id="musicSelect"></select>

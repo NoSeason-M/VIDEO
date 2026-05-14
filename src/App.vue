@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import { computed } from 'vue'
+
 
 const router = useRouter()
 const route = useRoute()
@@ -25,9 +25,58 @@ function toggleSidebar() {
 function navigateTo(path: string) {
   router.push(path)
 }
+
+
+
+// ========== 自动更新进度条 ==========
+const showUpdateModal = ref(false)
+const progress = ref({
+  percent: 0,
+  transferred: '0.00',
+  total: '0.00',
+  speed: '0.00'
+})
+
+onMounted(() => {
+  // 监听更新进度（用你现有的 electronAPI.on）
+  window.electronAPI.on('update-progress', (newProgress) => {
+    showUpdateModal.value = true
+    progress.value = newProgress as any
+  })
+
+  // 监听更新完成
+  window.electronAPI.on('update-finish', () => {
+    progress.value.percent = 100
+    setTimeout(() => {
+      showUpdateModal.value = false
+    }, 2000)
+  })
+
+  // 监听更新错误
+  window.electronAPI.on('update-error', (err) => {
+    showUpdateModal.value = false
+    alert('更新失败：' + err)
+  })
+})
 </script>
 
 <template>
+  <!-- 全局更新进度条弹窗（放在最外层，覆盖所有内容） -->
+  <div v-if="showUpdateModal" class="update-mask">
+    <div class="update-modal">
+      <h3>正在下载新版本</h3>
+      
+      <div class="progress-container">
+        <div class="progress-bar" :style="{ width: progress.percent + '%' }"></div>
+      </div>
+      
+      <div class="progress-info">
+        <span>{{ progress.percent }}%</span>
+        <span>{{ progress.transferred }}MB / {{ progress.total }}MB</span>
+        <span>{{ progress.speed }}MB/s</span>
+      </div>
+    </div>
+  </div>
   <div v-if="isLoginPage" class="login-layout">
     <router-view />
   </div>
@@ -72,6 +121,57 @@ function navigateTo(path: string) {
 </template>
 
 <style>
+/* 自动更新进度条样式 */
+.update-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* 最高层级，覆盖侧边栏和所有内容 */
+}
+
+.update-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.update-modal h3 {
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: #333;
+  font-size: 18px;
+}
+
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #409eff, #67c23a);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 14px;
+}
 /* 全局重置 */
 * {
   margin: 0;

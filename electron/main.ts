@@ -66,10 +66,21 @@ autoUpdater.on('update-not-available', () => {
 // 下载进度（可选，你也可以把进度传到渲染进程显示）
 autoUpdater.on('download-progress', (progress) => {
   console.log('更新下载进度：', progress.percent.toFixed(1) + '%')
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-progress', {
+      percent: Math.round(progress.percent),
+      transferred: (progress.transferred / 1024 / 1024).toFixed(2),
+      total: (progress.total / 1024 / 1024).toFixed(2),
+      speed: (progress.bytesPerSecond / 1024 / 1024).toFixed(2)
+    })
+  }
 })
 
 // 下载完成，询问用户重启安装
 autoUpdater.on('update-downloaded', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-finish')
+  }
   dialog.showMessageBox({
     type: 'info',
     title: '更新下载完成',
@@ -85,6 +96,9 @@ autoUpdater.on('update-downloaded', () => {
 // 更新错误
 autoUpdater.on('error', (err) => {
   console.error('自动更新失败：', err)
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-error', err.message)
+  }
 })
 
 
