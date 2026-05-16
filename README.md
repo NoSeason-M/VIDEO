@@ -7,14 +7,11 @@ Vue 3 + TypeScript + Electron 桌面应用项目。
 ### 快速开始
 
 ```bash
-# 1. 安装 pnpm（如已安装可跳过）
-npm install -g pnpm
+# 1. 安装依赖
+npm install
 
-# 2. 安装依赖
-pnpm install
-
-# 3. 启动开发服务器 + Electron 窗口
-pnpm dev
+# 2. 启动开发服务器 + Electron 窗口
+npm run dev
 ```
 
 > 要求 Node.js >= 18。首次安装 Electron 依赖较大会稍等片刻。
@@ -141,7 +138,7 @@ video/
 ```bash
 # 1. 更新 package.json 中的 version 字段
 # 2. 构建并打包
-pnpm run electron:build
+npm run electron:build
 # 3. 在 GitHub 创建 Release，上传 release/ 目录下的安装包
 ```
 
@@ -166,6 +163,12 @@ npm run dev
 
 ```bash
 npm run electron:build
+```
+
+## icon图标构建（需在根目录下有icon.png）
+
+```bash
+npm run generate-icons
 ```
 
 打包产物位于 `release/` 目录。
